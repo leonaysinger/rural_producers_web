@@ -8,6 +8,7 @@ import { Producers } from '../components/pages/Producers'
 import { Seasons } from '../components/pages/Seasons'
 import { Crops } from '../components/pages/Crops'
 import { Properties } from '../components/pages/Properties'
+import { Dashboard } from '../components/pages/Dashboard'
 
 export const AppRouter = () => {
   const isLoggedIn = useAppSelector(state => state.user.loggedIn)
@@ -66,6 +67,17 @@ export const AppRouter = () => {
           element={
             <ProtectedRoute>
               <Properties />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+
+      <Route element={<MainLayout />}>
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
             </ProtectedRoute>
           }
         />

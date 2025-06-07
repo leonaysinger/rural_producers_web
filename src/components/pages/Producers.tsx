@@ -30,7 +30,8 @@ export const Producers = () => {
       try {
         const result = await getProducers()
         setProducers(result.map(p => ({ ...p, id: Number(p.id), document_type: p.document_type as "CPF" | "CNPJ" })))
-      } catch {
+      } catch (err){
+        console.log('err: ', err);
         setToast({ message: 'Erro ao carregar produtores', type: 'error' })
       } finally {
         setLoading(false)

@@ -15,7 +15,8 @@ const Content = styled.div`
 
 const Main = styled.main`
   flex: 1;
-  padding: 1rem;
+  padding: 0;
+  overflow-y: auto;
   background-color: #f5f7fa;
 `
 

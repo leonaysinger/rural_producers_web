@@ -1,4 +1,7 @@
 // src/__tests__/Producers.test.tsx
+jest.mock('../api/producer')
+jest.mock('../utils/baseUrl')
+
 import '@testing-library/jest-dom'
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react'
 import * as api from '../api/producer'
@@ -6,7 +9,6 @@ import { store } from '../app/store'
 import { Producers } from '../components/pages/Producers'
 import { Provider } from 'react-redux'
 
-jest.mock('../api/producer')
 
 const mockedProducers = [
   {

@@ -55,6 +55,7 @@ export const Sidebar = () => {
         <Item to="/properties">Propriedades</Item>
         <Item to="/crops">Culturas</Item>
         <Item to="/seasons">Safras</Item>
+        <Item to="/dashboard">Dashboard</Item>
       </NavGroup>
 
       <LogoutButton onClick={handleLogout}>

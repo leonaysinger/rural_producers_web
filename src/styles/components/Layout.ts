@@ -6,7 +6,6 @@ export const Container = styled.div`
   flex-direction: column;
   gap: 2rem;
   background-color: #f5f7fa;
-  min-height: 100vh;
 `
 
 export const Title = styled.h1`
