@@ -1,11 +1,10 @@
 import { PrimaryButton, DangerButton } from '../../styles/components/Button'
 import { Table, Th, Td } from '../../styles/components/Table'
+import { FormSchema } from './ProducerForm'
 
-interface Producer {
+interface Producer extends Omit<FormSchema, 'document_type'> {
   id: number
-  name: string
-  document_type: string
-  document: string
+  document_type: "CPF" | "CNPJ"
 }
 
 interface Props {

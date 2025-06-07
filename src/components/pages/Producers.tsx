@@ -8,11 +8,12 @@ import {
 } from '../../styles/components/Button'
 import { Toast } from '../../styles/components/ui/Toast'
 import { getProducers, deleteProducer, postProducers, updateProducer } from '../../api/producer'
-import { ProducerForm } from '../producer/ProducerForm'
+import { FormSchema, ProducerForm } from '../producer/ProducerForm'
 import { ProducerList } from '../producer/ProducerList'
 
-interface Producer extends FormSchema {
-  id: number
+interface Producer extends Omit<FormSchema, 'document_type'> {
+    id: number
+    document_type: "CPF" | "CNPJ"
 }
 
 export const Producers = () => {
@@ -28,7 +29,7 @@ export const Producers = () => {
     const fetchProducers = async () => {
       try {
         const result = await getProducers()
-        setProducers(result)
+        setProducers(result.map(p => ({ ...p, id: Number(p.id), document_type: p.document_type as "CPF" | "CNPJ" })))
       } catch {
         setToast({ message: 'Erro ao carregar produtores', type: 'error' })
       } finally {
@@ -47,7 +48,7 @@ export const Producers = () => {
         setToast({ message: 'Produtor atualizado com sucesso!', type: 'success' })
       } else {
         const newProducer = await postProducers(data)
-        setProducers(prev => [...prev, newProducer])
+        setProducers(prev => [...prev, { ...newProducer, id: Number(newProducer.id), document_type: newProducer.document_type as "CPF" | "CNPJ" }])
         setToast({ message: 'Produtor cadastrado com sucesso!', type: 'success' })
       }
     } catch (err: any) {

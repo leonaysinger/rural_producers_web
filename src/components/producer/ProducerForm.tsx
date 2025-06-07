@@ -13,12 +13,9 @@ import { isValidCPF, isValidCNPJ } from '../../utils/validators'
 
 const schema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
-  document_type: z
-    .string()
-    .transform(val => (val === '' ? undefined : val))
-    .refine(val => val === 'CPF' || val === 'CNPJ', {
-      message: 'Tipo de documento é obrigatório'
-    }),
+  document_type: z.enum(['CPF', 'CNPJ'], {
+    errorMap: () => ({ message: 'Tipo de documento é obrigatório' })
+  }),
   document: z.string().min(1, 'Documento é obrigatório')
 }).superRefine((data, ctx) => {
   const raw = data.document.replace(/\D/g, '')
@@ -57,7 +54,7 @@ export const ProducerForm = ({ onCancel, onSubmit, initial }: Props) => {
     resolver: zodResolver(schema),
     defaultValues: {
       name: '',
-      document_type: '',
+      document_type: undefined,
       document: ''
     }
   })

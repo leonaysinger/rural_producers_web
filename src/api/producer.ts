@@ -13,8 +13,8 @@ export interface ProducerPayload {
     document: string
 }
 
-export async function getProducers(): Promise<ProducerResponse> {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL
+export async function getProducers(): Promise<ProducerResponse[]> {
+    const baseUrl = process.env.VITE_API_BASE_URL as string
 
     const res = await fetch(`${baseUrl}/producers`, {
         method: 'GET',
@@ -32,7 +32,7 @@ export async function getProducers(): Promise<ProducerResponse> {
 }
 
 export async function postProducers(data: ProducerPayload): Promise<ProducerResponse> {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL
+const baseUrl = process.env.VITE_API_BASE_URL as string
 
     const res = await fetch(`${baseUrl}/producers`, {
         method: 'POST',
@@ -51,7 +51,7 @@ export async function postProducers(data: ProducerPayload): Promise<ProducerResp
 }
 
 export async function updateProducer(id: number, data: Omit<ProducerPayload, 'id'>) {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL
+    const baseUrl = process.env.VITE_API_BASE_URL as string
 
     const response = await fetch(`${baseUrl}/producers/${id}`, {
         method: 'PUT',
@@ -65,7 +65,7 @@ export async function updateProducer(id: number, data: Omit<ProducerPayload, 'id
 }
 
 export async function deleteProducer(id: number): Promise<void> {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL
+    const baseUrl = process.env.VITE_API_BASE_URL as string
 
     const res = await fetch(`${baseUrl}/producers/${id}`, {
         method: 'DELETE',
