@@ -1,6 +1,4 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
-import { useAppSelector } from '../../app/hooks'
-import { getProducers, deleteProducer, postProducers } from '../../api/producer'
+import { useEffect, useState } from 'react'
 import {
   Container,
   Title,
@@ -14,11 +12,46 @@ import {
 } from '../../styles/components/Button'
 import { Table, Th, Td } from '../../styles/components/Table'
 import { FormField } from '../../styles/components/FormField'
-import styled from 'styled-components'
 import { isValidCPF, isValidCNPJ } from '../../utils/validators'
 import { IMaskInput } from 'react-imask'
 import { Toast } from '../../styles/components/ui/Toast'
 import { StyledTitle } from '../../styles/components/StyledTitle'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { getProducers, deleteProducer, postProducers, updateProducer } from '../../api/producer'
+import { useAppSelector } from '../../app/hooks'
+import { SelectField } from '../../styles/components/Select'
+import { ErrorText } from '../../styles/components/ErrorText'
+
+const schema = z.object({
+  name: z.string().min(1, 'Nome é obrigatório'),
+  document_type: z
+    .string()
+    .transform(val => (val === '' ? undefined : val))
+    .refine(val => val === 'CPF' || val === 'CNPJ', {
+      message: 'Tipo de documento é obrigatório'
+    }),
+  document: z.string().min(1, 'Documento é obrigatório')
+}).superRefine((data, ctx) => {
+  const raw = data.document.replace(/\D/g, '')
+  if (data.document_type === 'CPF' && !isValidCPF(raw)) {
+    ctx.addIssue({
+      path: ['document'],
+      code: z.ZodIssueCode.custom,
+      message: 'CPF inválido'
+    })
+  }
+  if (data.document_type === 'CNPJ' && !isValidCNPJ(raw)) {
+    ctx.addIssue({
+      path: ['document'],
+      code: z.ZodIssueCode.custom,
+      message: 'CNPJ inválido'
+    })
+  }
+})
+
+type FormSchema = z.infer<typeof schema>
 
 interface Producer {
   id: number
@@ -26,22 +59,6 @@ interface Producer {
   document_type: string
   document: string
 }
-
-const SelectField = styled.select`
-  display: block;
-  width: 100%;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-`
-
-const ErrorText = styled.p`
-  color: red;
-  font-size: 0.9rem;
-  margin-top: -0.5rem;
-  margin-bottom: 1rem;
-`
 
 const ProducerList = ({
   producers,
@@ -90,81 +107,77 @@ const ProducerForm = ({ onCancel, onSubmit, initial }: {
   onSubmit: (data: Omit<Producer, 'id'>) => void
   initial?: Producer
 }) => {
-  const [form, setForm] = useState<Omit<Producer, 'id'>>({
-    name: initial?.name || '',
-    document_type: initial?.document_type || '',
-    document: initial?.document || ''
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors }
+  } = useForm<FormSchema>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      name: '',
+      document_type: '',
+      document: ''
+    }
   })
-  const [error, setError] = useState<string>('')
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-    setError('')
-  }
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-
-    const rawDocument = form.document.replace(/\D/g, '')
-    if (form.document_type === 'CPF' && !isValidCPF(rawDocument)) {
-      setError('CPF inválido')
-      return
+  useEffect(() => {
+    if (initial) {
+      setValue('name', initial.name)
+      setValue('document_type', initial.document_type)
+      setValue('document', initial.document)
     }
-    if (form.document_type === 'CNPJ' && !isValidCNPJ(rawDocument)) {
-      setError('CNPJ inválido')
-      return
-    }
+  }, [initial, setValue])
 
-    onSubmit({ ...form, document: rawDocument })
-  }
-
-  const documentMask = form.document_type === 'CPF'
+  const document_type = watch('document_type')
+  const documentMask = document_type === 'CPF'
     ? '000.000.000-00'
-    : form.document_type === 'CNPJ'
-    ? '00.000.000/0000-00'
-    : ''
+    : document_type === 'CNPJ'
+      ? '00.000.000/0000-00'
+      : ''
 
   return (
     <div>
       <StyledTitle>{initial ? 'Editar Produtor' : 'Novo Produtor'}</StyledTitle>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit((data) => {
+        const raw = data.document.replace(/\D/g, '')
+        onSubmit({ ...data, document: raw })
+      })}>
         <FormField
-          name="name"
           placeholder="Nome do produtor"
-          value={form.name}
-          onChange={handleChange}
+          {...register('name')}
         />
+        {errors.name && <ErrorText>{errors.name.message}</ErrorText>}
 
-        <SelectField
-          name="document_type"
-          value={form.document_type}
-          onChange={handleChange}
-        >
+        <SelectField{...register('document_type')}>
           <option value="">Selecione o tipo de documento</option>
           <option value="CPF">CPF</option>
           <option value="CNPJ">CNPJ</option>
         </SelectField>
+        {errors.document_type && <ErrorText>{errors.document_type.message}</ErrorText>}
 
         {documentMask && (
-          <IMaskInput
-            mask={documentMask}
-            name="document"
-            value={form.document}
-            onAccept={(value) => setForm({ ...form, document: value })}
-            placeholder="Documento"
-            unmask={false}
-            style={{
-              width: '100%',
-              padding: '0.75rem 1rem',
-              fontSize: '1rem',
-              marginBottom: '1rem',
-              borderRadius: '6px',
-              border: '1px solid #ccc'
-            }}
-          />
+          <>
+            <IMaskInput
+              mask={documentMask}
+              {...register('document')}
+              value={watch('document')}
+              onAccept={(val: string) => setValue('document', val)}
+              placeholder="Documento"
+              unmask={false}
+              style={{
+                width: '100%',
+                padding: '0.75rem 1rem',
+                fontSize: '1rem',
+                marginBottom: '0.5rem',
+                borderRadius: '6px',
+                border: '1px solid #ccc'
+              }}
+            />
+            {errors.document && <ErrorText>{errors.document.message}</ErrorText>}
+          </>
         )}
-
-        {error && <ErrorText>{error}</ErrorText>}
 
         <PrimaryButton type="submit">Salvar</PrimaryButton>
         <SecondaryButton type="button" onClick={onCancel} style={{ marginLeft: '0.5rem' }}>
@@ -189,7 +202,7 @@ export const Producers = () => {
       try {
         const result = await getProducers()
         setProducers(result)
-      } catch (err) {
+      } catch {
         setToast({ message: 'Erro ao carregar produtores', type: 'error' })
       } finally {
         setLoading(false)
@@ -207,7 +220,8 @@ export const Producers = () => {
   const handleSubmit = async (data: Omit<Producer, 'id'>) => {
     try {
       if (editing) {
-        setProducers(prev => prev.map(p => (p.id === editing.id ? { ...p, ...data } : p)))
+        const updated = await updateProducer(editing.id, data)
+        setProducers(prev => prev.map(p => (p.id === editing.id ? updated : p)))
         setToast({ message: 'Produtor atualizado com sucesso!', type: 'success' })
       } else {
         const newProducer = await postProducers(data)
@@ -228,7 +242,7 @@ export const Producers = () => {
         await deleteProducer(toDelete.id)
         setProducers(prev => prev.filter(p => p.id !== toDelete.id))
         setToast({ message: 'Produtor excluído com sucesso', type: 'success' })
-      } catch (err) {
+      } catch {
         setToast({ message: 'Erro ao excluir produtor', type: 'error' })
       } finally {
         setToDelete(null)

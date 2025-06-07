@@ -50,6 +50,20 @@ export async function postProducers(data: ProducerPayload): Promise<ProducerResp
     return res.json()
 }
 
+export async function updateProducer(id: number, data: Omit<ProducerPayload, 'id'>) {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL
+
+    const response = await fetch(`${baseUrl}/producers/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    if (!response.ok) {
+        throw new Error('Erro ao atualizar produtor')
+    }
+    return await response.json()
+}
+
 export async function deleteProducer(id: number): Promise<void> {
     const baseUrl = import.meta.env.VITE_API_BASE_URL
 
