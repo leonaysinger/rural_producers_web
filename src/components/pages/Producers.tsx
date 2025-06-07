@@ -1,201 +1,28 @@
 import { useEffect, useState } from 'react'
+import { useAppSelector } from '../../app/hooks'
 import {
-  Container,
-  Title,
-  ModalOverlay,
-  ModalContent
+  Container, Title, ModalOverlay, ModalContent
 } from '../../styles/components/Layout'
 import {
-  PrimaryButton,
-  SecondaryButton,
-  DangerButton
+  PrimaryButton, SecondaryButton, DangerButton
 } from '../../styles/components/Button'
-import { Table, Th, Td } from '../../styles/components/Table'
-import { FormField } from '../../styles/components/FormField'
-import { isValidCPF, isValidCNPJ } from '../../utils/validators'
-import { IMaskInput } from 'react-imask'
 import { Toast } from '../../styles/components/ui/Toast'
-import { StyledTitle } from '../../styles/components/StyledTitle'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { getProducers, deleteProducer, postProducers, updateProducer } from '../../api/producer'
-import { useAppSelector } from '../../app/hooks'
-import { SelectField } from '../../styles/components/Select'
-import { ErrorText } from '../../styles/components/ErrorText'
+import { ProducerForm } from '../producer/ProducerForm'
+import { ProducerList } from '../producer/ProducerList'
 
-const schema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório'),
-  document_type: z
-    .string()
-    .transform(val => (val === '' ? undefined : val))
-    .refine(val => val === 'CPF' || val === 'CNPJ', {
-      message: 'Tipo de documento é obrigatório'
-    }),
-  document: z.string().min(1, 'Documento é obrigatório')
-}).superRefine((data, ctx) => {
-  const raw = data.document.replace(/\D/g, '')
-  if (data.document_type === 'CPF' && !isValidCPF(raw)) {
-    ctx.addIssue({
-      path: ['document'],
-      code: z.ZodIssueCode.custom,
-      message: 'CPF inválido'
-    })
-  }
-  if (data.document_type === 'CNPJ' && !isValidCNPJ(raw)) {
-    ctx.addIssue({
-      path: ['document'],
-      code: z.ZodIssueCode.custom,
-      message: 'CNPJ inválido'
-    })
-  }
-})
-
-type FormSchema = z.infer<typeof schema>
-
-interface Producer {
+interface Producer extends FormSchema {
   id: number
-  name: string
-  document_type: string
-  document: string
-}
-
-const ProducerList = ({
-  producers,
-  onEdit,
-  onDelete
-}: {
-  producers: Producer[]
-  onEdit: (p: Producer) => void
-  onDelete: (p: Producer) => void
-}) => {
-  if (producers.length === 0) {
-    return <p style={{ color: '#4a5568', marginTop: '1rem' }}>Nenhum produtor cadastrado.</p>
-  }
-
-  return (
-    <Table>
-      <thead>
-        <tr>
-          <Th>Nome</Th>
-          <Th>Tipo de Documento</Th>
-          <Th>Documento</Th>
-          <Th>Ações</Th>
-        </tr>
-      </thead>
-      <tbody>
-        {producers.map((p) => (
-          <tr key={p.id}>
-            <Td>{p.name}</Td>
-            <Td>{p.document_type}</Td>
-            <Td>{p.document}</Td>
-            <Td>
-              <PrimaryButton onClick={() => onEdit(p)}>Editar</PrimaryButton>
-              <DangerButton onClick={() => onDelete(p)} style={{ marginLeft: '0.5rem' }}>
-                Excluir
-              </DangerButton>
-            </Td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
-  )
-}
-
-const ProducerForm = ({ onCancel, onSubmit, initial }: {
-  onCancel: () => void
-  onSubmit: (data: Omit<Producer, 'id'>) => void
-  initial?: Producer
-}) => {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors }
-  } = useForm<FormSchema>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      name: '',
-      document_type: '',
-      document: ''
-    }
-  })
-
-  useEffect(() => {
-    if (initial) {
-      setValue('name', initial.name)
-      setValue('document_type', initial.document_type)
-      setValue('document', initial.document)
-    }
-  }, [initial, setValue])
-
-  const document_type = watch('document_type')
-  const documentMask = document_type === 'CPF'
-    ? '000.000.000-00'
-    : document_type === 'CNPJ'
-      ? '00.000.000/0000-00'
-      : ''
-
-  return (
-    <div>
-      <StyledTitle>{initial ? 'Editar Produtor' : 'Novo Produtor'}</StyledTitle>
-      <form onSubmit={handleSubmit((data) => {
-        const raw = data.document.replace(/\D/g, '')
-        onSubmit({ ...data, document: raw })
-      })}>
-        <FormField
-          placeholder="Nome do produtor"
-          {...register('name')}
-        />
-        {errors.name && <ErrorText>{errors.name.message}</ErrorText>}
-
-        <SelectField{...register('document_type')}>
-          <option value="">Selecione o tipo de documento</option>
-          <option value="CPF">CPF</option>
-          <option value="CNPJ">CNPJ</option>
-        </SelectField>
-        {errors.document_type && <ErrorText>{errors.document_type.message}</ErrorText>}
-
-        {documentMask && (
-          <>
-            <IMaskInput
-              mask={documentMask}
-              {...register('document')}
-              value={watch('document')}
-              onAccept={(val: string) => setValue('document', val)}
-              placeholder="Documento"
-              unmask={false}
-              style={{
-                width: '100%',
-                padding: '0.75rem 1rem',
-                fontSize: '1rem',
-                marginBottom: '0.5rem',
-                borderRadius: '6px',
-                border: '1px solid #ccc'
-              }}
-            />
-            {errors.document && <ErrorText>{errors.document.message}</ErrorText>}
-          </>
-        )}
-
-        <PrimaryButton type="submit">Salvar</PrimaryButton>
-        <SecondaryButton type="button" onClick={onCancel} style={{ marginLeft: '0.5rem' }}>
-          Cancelar
-        </SecondaryButton>
-      </form>
-    </div>
-  )
 }
 
 export const Producers = () => {
   const user = useAppSelector(state => state.user)
+  const [producers, setProducers] = useState<Producer[]>([])
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<Producer | null>(null)
-  const [producers, setProducers] = useState<Producer[]>([])
-  const [loading, setLoading] = useState(true)
   const [toDelete, setToDelete] = useState<Producer | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchProducers = async () => {
@@ -212,16 +39,11 @@ export const Producers = () => {
     fetchProducers()
   }, [])
 
-  const handleEdit = (producer: Producer) => {
-    setEditing(producer)
-    setShowForm(true)
-  }
-
   const handleSubmit = async (data: Omit<Producer, 'id'>) => {
     try {
       if (editing) {
-        const updated = await updateProducer(editing.id, data)
-        setProducers(prev => prev.map(p => (p.id === editing.id ? updated : p)))
+        setProducers(prev => prev.map(p => (p.id === editing.id ? { ...p, ...data } : p)))
+        await updateProducer(editing.id, data)
         setToast({ message: 'Produtor atualizado com sucesso!', type: 'success' })
       } else {
         const newProducer = await postProducers(data)
@@ -237,35 +59,39 @@ export const Producers = () => {
   }
 
   const confirmDelete = async () => {
-    if (toDelete) {
-      try {
-        await deleteProducer(toDelete.id)
-        setProducers(prev => prev.filter(p => p.id !== toDelete.id))
-        setToast({ message: 'Produtor excluído com sucesso', type: 'success' })
-      } catch {
-        setToast({ message: 'Erro ao excluir produtor', type: 'error' })
-      } finally {
-        setToDelete(null)
-      }
+    if (!toDelete) return
+    try {
+      await deleteProducer(toDelete.id)
+      setProducers(prev => prev.filter(p => p.id !== toDelete.id))
+      setToast({ message: 'Produtor excluído com sucesso', type: 'success' })
+    } catch {
+      setToast({ message: 'Erro ao excluir produtor', type: 'error' })
+    } finally {
+      setToDelete(null)
     }
   }
 
   return (
     <Container>
       <Title>Produtores</Title>
+
       {showForm ? (
         <ProducerForm
-          onCancel={() => {
-            setShowForm(false)
-            setEditing(null)
-          }}
+          onCancel={() => { setShowForm(false); setEditing(null) }}
           onSubmit={handleSubmit}
           initial={editing || undefined}
         />
       ) : (
         <>
           <PrimaryButton onClick={() => setShowForm(true)}>+ Novo Produtor</PrimaryButton>
-          {loading ? <p>Carregando...</p> : <ProducerList producers={producers} onEdit={handleEdit} onDelete={setToDelete} />}
+          {loading
+            ? <p>Carregando...</p>
+            : <ProducerList
+                producers={producers}
+                onEdit={(p) => { setEditing(p); setShowForm(true) }}
+                onDelete={setToDelete}
+              />
+          }
         </>
       )}
 
@@ -284,11 +110,7 @@ export const Producers = () => {
       )}
 
       {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
       )}
     </Container>
   )
