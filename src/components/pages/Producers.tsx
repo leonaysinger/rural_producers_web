@@ -18,6 +18,7 @@ import styled from 'styled-components'
 import { isValidCPF, isValidCNPJ } from '../../utils/validators'
 import { IMaskInput } from 'react-imask'
 import { Toast } from '../../styles/components/ui/Toast'
+import { StyledTitle } from '../../styles/components/StyledTitle'
 
 interface Producer {
   id: number
@@ -125,7 +126,7 @@ const ProducerForm = ({ onCancel, onSubmit, initial }: {
 
   return (
     <div>
-      <h2>{initial ? 'Editar Produtor' : 'Novo Produtor'}</h2>
+      <StyledTitle>{initial ? 'Editar Produtor' : 'Novo Produtor'}</StyledTitle>
       <form onSubmit={handleSubmit}>
         <FormField
           name="name"

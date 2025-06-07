@@ -1,8 +1,6 @@
-import React from 'react'
 import styled from 'styled-components'
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from '../components/main/Sidebar'
-import { Topbar } from '../components/main/Topbar'
 
 const Container = styled.div`
   display: flex;
@@ -26,7 +24,6 @@ export const MainLayout = () => {
       <Container>
         <Sidebar />
         <Content>
-          <Topbar />
           <Main>
             <Outlet />
           </Main>
