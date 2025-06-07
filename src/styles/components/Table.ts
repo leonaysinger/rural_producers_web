@@ -6,6 +6,10 @@ export const Table = styled.table`
   background: white;
   border-radius: 8px;
   overflow: hidden;
+
+  tbody tr:hover {
+    background-color: #f0f0f0;
+  }
 `
 
 export const Th = styled.th`
