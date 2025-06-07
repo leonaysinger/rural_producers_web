@@ -24,6 +24,9 @@ const Item = styled(NavLink)`
 export const Sidebar = () => (
   <Container>
     <Item to="/home">Home</Item>
-    <Item to="/outra">Outra Página</Item>
+    <Item to="/producers">Produtores</Item>
+    <Item to="/properties">Propriedades</Item>
+    <Item to="/crops">Culturas</Item>
+    <Item to="/seasons">Safras</Item>
   </Container>
 )

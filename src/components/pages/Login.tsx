@@ -103,7 +103,7 @@ export const Login = () => {
         setApiError('')
         try {
             const result = await loginRequest(email, password)
-            dispatch(login(result.name))
+            dispatch(login(result.user_name))
             navigate('/home', { replace: true })
         } catch (err: any) {
             setApiError(err.message)
