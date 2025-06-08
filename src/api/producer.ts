@@ -51,7 +51,7 @@ export async function postProducers(data: ProducerPayload): Promise<ProducerResp
     return res.json()
 }
 
-export async function updateProducer(id: number, data: Omit<ProducerPayload, 'id'>) {
+export async function updateProducer(id: string, data: Omit<ProducerPayload, 'id'>) {
     const response = await fetch(`${baseUrl}/producers/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -63,7 +63,7 @@ export async function updateProducer(id: number, data: Omit<ProducerPayload, 'id
     return await response.json()
 }
 
-export async function deleteProducer(id: number): Promise<void> {
+export async function deleteProducer(id: string): Promise<void> {
     const res = await fetch(`${baseUrl}/producers/${id}`, {
         method: 'DELETE',
         headers: {

@@ -3,7 +3,7 @@ import { Table, Th, Td } from '../../styles/components/Table'
 import { FormSchema } from './ProducerForm'
 
 interface Producer extends Omit<FormSchema, 'document_type'> {
-  id: number
+  id: string
   document_type: "CPF" | "CNPJ"
 }
 

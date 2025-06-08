@@ -7,18 +7,17 @@ import {
   PrimaryButton, SecondaryButton, DangerButton
 } from '../../styles/components/Button'
 import { Toast } from '../../styles/components/ui/Toast'
-import { getProducers, deleteProducer, postProducers, updateProducer } from '../../api/producer'
+import { getProducers, deleteProducer, postProducers, updateProducer, ProducerResponse } from '../../api/producer'
 import { FormSchema, ProducerForm } from '../producer/ProducerForm'
 import { ProducerList } from '../producer/ProducerList'
 
 interface Producer extends Omit<FormSchema, 'document_type'> {
-    id: number
+    id: string
     document_type: "CPF" | "CNPJ"
 }
 
 export const Producers = () => {
-  const user = useAppSelector(state => state.user)
-  const [producers, setProducers] = useState<Producer[]>([])
+  const [producers, setProducers] = useState<ProducerResponse[]>([])
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<Producer | null>(null)
   const [toDelete, setToDelete] = useState<Producer | null>(null)
@@ -29,7 +28,7 @@ export const Producers = () => {
     const fetchProducers = async () => {
       try {
         const result = await getProducers()
-        setProducers(result.map(p => ({ ...p, id: Number(p.id), document_type: p.document_type as "CPF" | "CNPJ" })))
+        setProducers(result)
       } catch (err){
         console.log('err: ', err);
         setToast({ message: 'Erro ao carregar produtores', type: 'error' })
@@ -49,7 +48,7 @@ export const Producers = () => {
         setToast({ message: 'Produtor atualizado com sucesso!', type: 'success' })
       } else {
         const newProducer = await postProducers(data)
-        setProducers(prev => [...prev, { ...newProducer, id: Number(newProducer.id), document_type: newProducer.document_type as "CPF" | "CNPJ" }])
+        setProducers([newProducer])
         setToast({ message: 'Produtor cadastrado com sucesso!', type: 'success' })
       }
     } catch (err: any) {
@@ -89,7 +88,10 @@ export const Producers = () => {
           {loading
             ? <p>Carregando...</p>
             : <ProducerList
-                producers={producers}
+                producers={producers.map(p => ({
+                  ...p,
+                  document_type: p.document_type as "CPF" | "CNPJ"
+                }))}
                 onEdit={(p) => { setEditing(p); setShowForm(true) }}
                 onDelete={setToDelete}
               />

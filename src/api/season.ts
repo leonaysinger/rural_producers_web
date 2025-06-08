@@ -9,7 +9,7 @@ export interface SeasonPayload {
     year: number
 }
 
-export async function getSeasons(): Promise<SeasonResponse> {
+export async function getSeasons(): Promise<SeasonResponse[]> {
     const baseUrl = import.meta.env.VITE_API_BASE_URL
 
     const res = await fetch(`${baseUrl}/seasons`, {
@@ -27,7 +27,7 @@ export async function getSeasons(): Promise<SeasonResponse> {
     return res.json()
 }
 
-export async function postSeason(data: SeasonPayload): Promise<SeasonResponse[]> {
+export async function postSeason(data: SeasonPayload): Promise<SeasonResponse> {
     const baseUrl = import.meta.env.VITE_API_BASE_URL
 
     const res = await fetch(`${baseUrl}/seasons`, {

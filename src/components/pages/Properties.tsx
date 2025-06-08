@@ -9,7 +9,7 @@ import { Toast } from '../../styles/components/ui/Toast'
 import { getProducers } from '../../api/producer'
 import { getSeasons } from '../../api/season'
 import { getCrops } from '../../api/crop'
-import { deleteProperty, getProperties, postProperty, updateProperty } from '../../api/property'
+import { deleteProperty, getProperties, postProperty, PropertyResponse, updateProperty } from '../../api/property'
 import { PropertyForm } from '../property/PropertyForm'
 import { PropertyList } from '../property/PropertyList'
 
@@ -17,7 +17,7 @@ interface Property {
   id: string
   name: string
   producer_id: string
-  crops: {
+  property_crops: {
     season_id: string
     crop_ids: string[]
   }[]
@@ -28,7 +28,7 @@ interface Season { id: string; name: string; year: number }
 interface Crop { id: string; name: string }
 
 export const Properties = () => {
-  const [properties, setProperties] = useState<Property[]>([])
+  const [properties, setProperties] = useState<PropertyResponse[]>([])
   const [producers, setProducers] = useState<Producer[]>([])
   const [seasons, setSeasons] = useState<Season[]>([])
   const [crops, setCrops] = useState<Crop[]>([])
@@ -54,7 +54,7 @@ export const Properties = () => {
     fetchAll()
   }, [])
 
-  const handleSubmit = async (data: Omit<Property, 'id'>) => {
+  const handleSubmit = async (data: any) => {
     try {
       if (editing) {
         const updated = await updateProperty(editing.id, data)
@@ -105,7 +105,7 @@ export const Properties = () => {
           <PropertyList
             properties={properties}
             onEdit={(p) => { setEditing(p); setShowForm(true) }}
-            onDelete={setToDelete}
+            onDelete={(p) => setToDelete(p)}
           />
         </>
       )}

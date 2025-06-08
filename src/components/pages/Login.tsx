@@ -127,7 +127,7 @@ export const Login = () => {
                             type="email"
                             placeholder="E-mail"
                             value={email}
-                            hasError={!!errors.email}
+                            $hasError={!!errors.email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
                         {errors.email && <Error>{errors.email}</Error>}
@@ -136,7 +136,7 @@ export const Login = () => {
                             type="password"
                             placeholder="Senha"
                             value={password}
-                            hasError={!!errors.password}
+                            $hasError={!!errors.password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
                         {errors.password && <Error>{errors.password}</Error>}
@@ -145,7 +145,7 @@ export const Login = () => {
                             {loading ? 'Entrando...' : 'Entrar'}
                         </Button>
 
-                        {apiError && <Error>{apiError}</Error>}
+                        <p style={{ marginTop: '2rem' }}>{apiError && <Error>{apiError}</Error>}</p>
                     </>
                 )}
             </Card>

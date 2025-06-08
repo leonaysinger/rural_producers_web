@@ -7,7 +7,7 @@ export interface CropPayload {
     name: string
 }
 
-export async function getCrops(): Promise<CropResponse> {
+export async function getCrops(): Promise<CropResponse[]> {
     const baseUrl = import.meta.env.VITE_API_BASE_URL
 
     const res = await fetch(`${baseUrl}/crops`, {
@@ -25,7 +25,7 @@ export async function getCrops(): Promise<CropResponse> {
     return res.json()
 }
 
-export async function postCrop(data: CropPayload): Promise<CropResponse[]> {
+export async function postCrop(data: CropPayload): Promise<CropResponse> {
     const baseUrl = import.meta.env.VITE_API_BASE_URL
 
     const res = await fetch(`${baseUrl}/crops`, {
