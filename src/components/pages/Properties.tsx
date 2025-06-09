@@ -12,6 +12,7 @@ import { getCrops } from '../../api/crop'
 import { deleteProperty, getProperties, postProperty, PropertyResponse, updateProperty } from '../../api/property'
 import { PropertyForm } from '../property/PropertyForm'
 import { PropertyList } from '../property/PropertyList'
+import { StyledTitle } from '../../styles/components/StyledTitle'
 
 interface Property {
   id: string
@@ -47,7 +48,8 @@ export const Properties = () => {
         setProducers(prods)
         setSeasons(seas)
         setCrops(crs)
-      } catch {
+      } catch (e){
+        console.log('eee: ', e)
         setToast({ message: 'Erro ao carregar dados', type: 'error' })
       }
     }
@@ -113,9 +115,9 @@ export const Properties = () => {
       {toDelete && (
         <ModalOverlay>
           <ModalContent>
-            <p>Deseja excluir {toDelete.name}?</p>
+            <StyledTitle>Deseja excluir {toDelete.name}?</StyledTitle>
             <DangerButton onClick={confirmDelete}>Sim</DangerButton>
-            <SecondaryButton onClick={() => setToDelete(null)}>Cancelar</SecondaryButton>
+            <SecondaryButton onClick={() => setToDelete(null)} style={{ marginLeft: '0.5rem'}}>Cancelar</SecondaryButton>
           </ModalContent>
         </ModalOverlay>
       )}

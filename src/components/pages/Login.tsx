@@ -1,6 +1,7 @@
 import { useState, type InputHTMLAttributes } from 'react'
 import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
+import type { RootState } from '../../app/store'
 import { login, logout } from '../../features/user/userSlice'
 import { loginRequest } from '../../api/auth'
 import { useNavigate } from 'react-router-dom'
@@ -75,7 +76,7 @@ const Error = styled.p`
 
 export const Login = () => {
     const dispatch = useAppDispatch()
-    const user = useAppSelector(state => state.user)
+    const user = useAppSelector((state: RootState) => state.user)
     const navigate = useNavigate()
 
     const [email, setEmail] = useState('')
@@ -99,11 +100,19 @@ export const Login = () => {
 
     const handleLogin = async () => {
         if (!validate()) return
+
         setLoading(true)
         setApiError('')
+
         try {
             const result = await loginRequest(email, password)
-            dispatch(login(result.user_name))
+
+            dispatch(login({
+                name: result.user_name,
+                access_token: result.access_token,
+                refresh_token: result.refresh_token
+            }))
+
             navigate('/home', { replace: true })
         } catch (err: any) {
             setApiError(err.message)

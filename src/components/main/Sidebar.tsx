@@ -1,5 +1,7 @@
 import styled from 'styled-components'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { logout } from '../../features/user/userSlice'
+import { useAppDispatch } from '../../app/hooks'
 
 const Container = styled.div`
   width: 220px;
@@ -41,10 +43,13 @@ const LogoutButton = styled.button`
 `
 
 export const Sidebar = () => {
+  const navigate = useNavigate()
+  const dispatch = useAppDispatch()
+
   const handleLogout = () => {
-    // TODO: Implementar logout real
+    dispatch(logout()) 
     localStorage.clear()
-    window.location.href = '/login'
+    navigate('/login', { replace: true })
   }
 
   return (

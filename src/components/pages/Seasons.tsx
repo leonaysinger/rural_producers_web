@@ -16,6 +16,7 @@ import { Table, Th, Td } from '../../styles/components/Table'
 import { FormField } from '../../styles/components/FormField'
 import { Toast } from '../../styles/components/ui/Toast'
 import { deleteSeason, getSeasons, postSeason, updateSeason } from '../../api/season'
+import { StyledTitle } from '../../styles/components/StyledTitle'
 
 interface Season {
   id: string
@@ -88,7 +89,7 @@ const SeasonForm = ({
 
   return (
     <div>
-      <h2>{initial ? 'Editar Safra' : 'Nova Safra'}</h2>
+      <StyledTitle>{initial ? 'Editar Safra' : 'Nova Safra'}</StyledTitle>
       <form onSubmit={handleSubmit}>
         <FormField
           name="name"
@@ -189,9 +190,9 @@ export const Seasons = () => {
       {toDelete && (
         <ModalOverlay>
           <ModalContent>
-            <p>Deseja excluir {toDelete.name}?</p>
+            <StyledTitle>Deseja excluir {toDelete.name}?</StyledTitle>
             <DangerButton onClick={confirmDelete}>Sim, excluir</DangerButton>
-            <SecondaryButton onClick={() => setToDelete(null)} style={{ marginLeft: '0.5rem' }}>
+            <SecondaryButton onClick={() => setToDelete(null)} style={{ marginLeft: '0.5rem'}}>
               Cancelar
             </SecondaryButton>
           </ModalContent>

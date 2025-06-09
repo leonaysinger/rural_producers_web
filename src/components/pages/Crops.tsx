@@ -15,6 +15,7 @@ import { Table, Th, Td } from '../../styles/components/Table'
 import { FormField } from '../../styles/components/FormField'
 import { Toast } from '../../styles/components/ui/Toast'
 import { getCrops, postCrop, updateCrop, deleteCrop } from '../../api/crop'
+import { StyledTitle } from '../../styles/components/StyledTitle'
 
 interface Crop {
   id: string
@@ -83,7 +84,7 @@ const CropForm = ({
 
   return (
     <div>
-      <h2>{initial ? 'Editar Cultura' : 'Nova Cultura'}</h2>
+      <StyledTitle>{initial ? 'Editar Cultura' : 'Nova Cultura'}</StyledTitle>
       <form onSubmit={handleSubmit}>
         <FormField
           name="name"
@@ -177,7 +178,7 @@ export const Crops = () => {
       {toDelete && (
         <ModalOverlay>
           <ModalContent>
-            <p>Deseja excluir {toDelete.name}?</p>
+            <StyledTitle>Deseja excluir {toDelete.name}?</StyledTitle>
             <DangerButton onClick={confirmDelete}>Sim, excluir</DangerButton>
             <SecondaryButton onClick={() => setToDelete(null)} style={{ marginLeft: '0.5rem' }}>
               Cancelar

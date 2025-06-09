@@ -2,17 +2,20 @@ import { BrowserRouter } from 'react-router-dom'
 import { AppRouter } from './routes/AppRouter'
 import { useEffect } from 'react'
 import { useAppDispatch } from './app/hooks'
-import { login } from './features/user/userSlice'
+import { hydrate, login } from './features/user/userSlice'
 
 function App() {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('loggedIn') === 'true'
-    const name = localStorage.getItem('name') || ''
-    if (isLoggedIn) {
-      dispatch(login(name))
+    const token = localStorage.getItem('access_token')
+    const name = localStorage.getItem('name')
+    const loggedIn = localStorage.getItem('loggedIn')
+
+    if (token && name && loggedIn === 'true') {
+      dispatch(login({ name, access_token: token, refresh_token: '' }))
     }
+    dispatch(hydrate())
   }, [])
 
   return (
