@@ -1,6 +1,5 @@
 import '@testing-library/jest-dom'
 import { render, screen, fireEvent } from '@testing-library/react'
-import React from 'react'
 import { ProducerList } from '../components/producer/ProducerList'
 import type { Producer } from '../components/producer/ProducerList'
 

@@ -15,7 +15,7 @@ export const AppRouter = () => {
   const location = useLocation()
 
   if (!hydrated) {
-    return null // ou <LoadingSpinner />
+    return null
   }
 
   return (
