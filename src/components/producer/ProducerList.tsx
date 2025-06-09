@@ -2,7 +2,7 @@ import { PrimaryButton, DangerButton } from '../../styles/components/Button'
 import { Table, Th, Td } from '../../styles/components/Table'
 import { FormSchema } from './ProducerForm'
 
-interface Producer extends Omit<FormSchema, 'document_type'> {
+export interface Producer extends Omit<FormSchema, 'document_type'> {
   id: string
   document_type: "CPF" | "CNPJ"
 }

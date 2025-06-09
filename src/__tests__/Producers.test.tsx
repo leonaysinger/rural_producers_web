@@ -1,7 +1,8 @@
 // src/__tests__/Producers.test.tsx
 jest.mock('../api/producer')
-jest.mock('../utils/baseUrl')
-
+jest.mock('../utils/baseUrl', () => ({
+  getBaseUrl: () => 'http://localhost:3000', // mock base URL
+}))
 import '@testing-library/jest-dom'
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react'
 import * as api from '../api/producer'
